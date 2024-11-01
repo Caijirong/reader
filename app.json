@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "expo-example",
-    "slug": "expo-example",
+    "slug": "render",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -31,6 +31,12 @@
     ],
     "experiments": {
       "typedRoutes": true
-    }
+    },
+    "extra": {
+      "eas": {
+        "projectId": "e3530a20-d517-46d8-8e4f-9616eaacfc53"
+      }
+    },
+    "owner": "haowan"
   }
 }

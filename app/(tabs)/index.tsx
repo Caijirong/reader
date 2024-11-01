@@ -1,70 +1,56 @@
-import { Image, StyleSheet, Platform } from 'react-native';
-
-import { HelloWave } from '@/components/HelloWave';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
+import { View, StyleSheet } from 'react-native';
+import Page from '@/components/Page';
+import { Book as BookType } from '@/types/book';
+import Book from '@/components/Book';
+
+// 默认封面
+const defaultCover = require('@/assets/images/cat.jpeg');
+
+// 生成随机长度的中文名字
+function generateRandomChineseName(length: number) {
+  return Array.from({ length }, () => String.fromCharCode(0x4e00 + Math.floor(Math.random() * 0x9fa5))).join('');
+}
+
+const mockBooks: BookType[] = Array.from({ length: 10 }, (_, index) => ({
+  id: index.toString(),
+  title: generateRandomChineseName(Math.floor(Math.random() * 10) + 5),
+  cover: defaultCover,
+  author: `Author ${index + 1}`,
+  category: ['小说', '历史', '科技'][index % 3],
+}));
 
 export default function HomeScreen() {
+  const rows = mockBooks.reduce((acc: BookType[][], curr, i) => {
+    if (i % 3 === 0) {
+      acc.push([curr]);
+    } else {
+      acc[acc.length - 1].push(curr);
+    }
+    return acc;
+  }, []);
+
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({ ios: 'cmd + d', android: 'cmd + m' })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-        <ThemedText>
-          Tap the Explore tab to learn more about what's included in this starter app.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          When you're ready, run{' '}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+    <Page style={{ paddingHorizontal: 20 }} scroll>
+      {rows.map((row, rowIndex) => (
+        <View
+          key={`row-${rowIndex}`}
+          style={styles.bookCol}
+        >
+          {row.map((book) => (
+            <Book key={book.id} book={book} />
+          ))}
+        </View>
+      ))}
+    </Page>
   );
 }
 
 const styles = StyleSheet.create({
-  titleContainer: {
+  bookCol: {
     flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
-  },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
+    justifyContent: 'space-between',
+    marginBottom: 0,
+    width: '100%'
   },
 });
