@@ -1,6 +1,6 @@
-import { View, Pressable } from 'react-native';
+import { View, Pressable, FlatList, StyleSheet } from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
-import { useLayoutEffect, useState } from 'react';
+import { useEffect, useLayoutEffect, useState, useMemo } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { Alert } from 'react-native';
@@ -8,6 +8,9 @@ import { useDocumentPicker } from '@/hooks/useDocumentPicker';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { PopupMenu, MenuItem } from '@/components/PopupMenu';
 import { useBarCodeScanner } from '@/hooks/useBarCodeScanner';
+import { BookSourceType } from '@/types/bookSource';
+import useBookSource from '@/hooks/useBookSource';
+import { SearchBar } from '@/components/SearchBar';
 
 function HeaderRight() {
     const insets = useSafeAreaInsets();
@@ -71,16 +74,86 @@ function HeaderRight() {
 
 export default function BookSourceScreen() {
     const navigation = useNavigation();
+    const [searchText, setSearchText] = useState('');
+    const { getBookSource } = useBookSource();
+    const [bookSource, setBookSource] = useState<BookSourceType[]>([]);
 
     useLayoutEffect(() => {
         navigation.setOptions({
             headerRight: () => <HeaderRight />,
+            headerShadowVisible: false, // 隐藏阴影
         });
     }, [navigation]);
 
+    useEffect(() => {
+        getBookSource().then(setBookSource);
+    }, []);
+
+    const filteredBookSource = useMemo(() => {
+        const searchLower = searchText.toLowerCase();
+        return bookSource.filter(source =>
+            source.bookSourceName.toLowerCase().includes(searchLower) ||
+            source.bookSourceUrl.toLowerCase().includes(searchLower)
+        );
+    }, [bookSource, searchText]);
+
+    const renderItem = ({ item }: { item: BookSourceType }) => (
+        <View style={styles.sourceItem}>
+            <ThemedText style={styles.sourceName}>{item.bookSourceName}</ThemedText>
+            <ThemedText style={styles.sourceUrl}>{item.bookSourceUrl}</ThemedText>
+        </View>
+    );
+
     return (
-        <View>
-            <ThemedText>123</ThemedText>
+        <View style={styles.container}>
+            <View style={styles.header}>
+                <SearchBar
+                    value={searchText}
+                    onChangeText={setSearchText}
+                    placeholder="搜索书源名称或网址"
+                />
+            </View>
+            <FlatList
+                data={filteredBookSource}
+                renderItem={renderItem}
+                keyExtractor={item => item.bookSourceUrl}
+                contentContainerStyle={styles.listContainer}
+            />
         </View>
     );
 }
+
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+    },
+    header: {
+        paddingHorizontal: 12,
+        paddingTop: 4,
+        paddingBottom: 10,
+        backgroundColor: 'white',
+    },
+    listContainer: {
+        padding: 10,
+    },
+    sourceItem: {
+        padding: 12,
+        backgroundColor: 'white',
+        borderRadius: 8,
+        marginBottom: 8,
+        elevation: 2,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.2,
+        shadowRadius: 2,
+    },
+    sourceName: {
+        fontSize: 16,
+        fontWeight: '500',
+        marginBottom: 4,
+    },
+    sourceUrl: {
+        fontSize: 14,
+        color: '#666',
+    },
+});

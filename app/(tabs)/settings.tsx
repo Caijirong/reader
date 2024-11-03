@@ -1,4 +1,3 @@
-import Page from '@/components/Page';
 import { ThemedText } from '@/components/ThemedText';
 import { View, StyleSheet, Pressable } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
@@ -46,7 +45,7 @@ export default function SettingsScreen() {
     };
 
     return (
-        <Page>
+        <View>
             {groups.map((group) => (
                 <View key={group.key} style={styles.section}>
                     <ThemedText style={styles.sectionHeader}>{group.title}</ThemedText>
@@ -68,7 +67,7 @@ export default function SettingsScreen() {
                     </View>
                 </View>
             ))}
-        </Page>
+        </View>
     );
 }
 

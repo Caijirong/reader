@@ -30,7 +30,7 @@ export default function RootLayout() {
   return (
     <SafeAreaProvider>
       <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-        <Stack>
+        <Stack screenOptions={{ headerBackTitleVisible: false }}>
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
           <Stack.Screen name="settings/bookSource" options={{ title: '书源' }} />
           <Stack.Screen name="settings/about" options={{ title: '关于' }} />

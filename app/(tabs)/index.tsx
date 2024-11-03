@@ -1,8 +1,10 @@
-import { ThemedText } from '@/components/ThemedText';
-import { View, StyleSheet } from 'react-native';
-import Page from '@/components/Page';
+import { View, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import { Book as BookType } from '@/types/book';
 import Book from '@/components/Book';
+import { Ionicons } from '@expo/vector-icons';
+import { useThemeColor } from '@/hooks/useThemeColor';
+import { useLayoutEffect } from 'react';
+import { useNavigation } from '@react-navigation/native';
 
 // 默认封面
 const defaultCover = require('@/assets/images/cat.jpeg');
@@ -21,6 +23,25 @@ const mockBooks: BookType[] = Array.from({ length: 10 }, (_, index) => ({
 }));
 
 export default function HomeScreen() {
+  const navigation = useNavigation();
+  const iconColor = useThemeColor({}, 'text');
+
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerRight: () => (
+        <TouchableOpacity
+          onPress={() => {
+            // TODO: 实现搜索功能
+            console.log('Search pressed');
+          }}
+          style={{ marginRight: 15 }}
+        >
+          <Ionicons name="search" size={24} color={iconColor} />
+        </TouchableOpacity>
+      )
+    });
+  }, [navigation, iconColor]);
+
   const rows = mockBooks.reduce((acc: BookType[][], curr, i) => {
     if (i % 3 === 0) {
       acc.push([curr]);
@@ -31,7 +52,10 @@ export default function HomeScreen() {
   }, []);
 
   return (
-    <Page style={{ paddingHorizontal: 20 }} scroll>
+    <ScrollView
+      showsVerticalScrollIndicator={false}
+      style={{ paddingHorizontal: 20 }}
+    >
       {rows.map((row, rowIndex) => (
         <View
           key={`row-${rowIndex}`}
@@ -42,7 +66,7 @@ export default function HomeScreen() {
           ))}
         </View>
       ))}
-    </Page>
+    </ScrollView>
   );
 }
 

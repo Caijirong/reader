@@ -1,10 +1,10 @@
 import { ThemedText } from '@/components/ThemedText';
-import Page from '@/components/Page';
+import { View } from 'react-native';
 
 export default function ExploreScreen() {
   return (
-    <Page>
+    <View>
       <ThemedText>Explore Screen</ThemedText>
-    </Page>
+    </View>
   );
 }
